@@ -172,9 +172,9 @@ func messageToReply(m *resp.Message) (*Reply, error) {
 			return nil, err
 		}
 		reply.Type = MultiReply
-		reply.Sub = make([]*Reply, len(ms))
+		reply.Children = make([]*Reply, len(ms))
 		for i := range ms {
-			reply.Sub[i], err = messageToReply(ms[i])
+			reply.Children[i], err = messageToReply(ms[i])
 			if err != nil {
 				return nil, err
 			}

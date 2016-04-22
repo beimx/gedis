@@ -1,4 +1,4 @@
-package pool
+package gedis
 
 type SentinelPool struct {
 

@@ -185,7 +185,7 @@ func (r *Reply) Hash() (map[string]string, error) {
 		if err != nil {
 			return nil, errors.New("key child is not string")
 		}
-		val := r.Children[i * 2 + 1]
+		val := r.Children[i * 2 + 1] // 取奇数child作为value
 		if val.Type == BulkReply {
 			value = string(val.buf)
 			hash[key] = value
@@ -196,6 +196,16 @@ func (r *Reply) Hash() (map[string]string, error) {
 		}
 	}
 	return hash
+}
+
+func (r *Reply)Nil() error {
+	if r.Type == ErrorReply {
+		return r.Err
+	}else if r.Type == NilReply {
+		return nil
+	}else {
+		return errors.New("value type is not NilReply")
+	}
 }
 
 func (r *Reply)String() string {

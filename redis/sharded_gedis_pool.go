@@ -1,21 +1,21 @@
 package gedis
 
 type ShardedGedisPool struct {
-	shards  []*ShardInfo
+	shards  []ShardInfo
 
 	pool    chan *ShardedGedis
 
 	builder ShardedPoolBuilder
 }
 
-type ShardedPoolBuilder func(shards []*ShardInfo) (*ShardedGedis, error)
+type ShardedPoolBuilder func(shards []ShardInfo) (*ShardedGedis, error)
 
 // 默认使用
-func NewShardedGedisPool(shards []*ShardInfo, size int) (*ShardedGedisPool, error) {
+func NewShardedGedisPool(shards []ShardInfo, size int) (*ShardedGedisPool, error) {
 	return NewShardedGedisPoolWithCustom(shards, size, NewShardedGedis(shards))
 }
 
-func NewShardedGedisPoolWithCustom(shards []*ShardInfo, size int, builder ShardedPoolBuilder) (*ShardedGedisPool, error) {
+func NewShardedGedisPoolWithCustom(shards []ShardInfo, size int, builder ShardedPoolBuilder) (*ShardedGedisPool, error) {
 	gedises := make([]*ShardedGedis, 0, size)
 	for i := 0; i < size; i++ {
 		gedis, err := builder(shards)
@@ -23,6 +23,7 @@ func NewShardedGedisPoolWithCustom(shards []*ShardInfo, size int, builder Sharde
 			for _, g := range gedises {
 				g.Close()
 			}
+			return nil, err
 		}
 		if gedis != nil {
 			gedises = append(gedises, gedis)

@@ -11,31 +11,31 @@ type ShardedGedisPool struct {
 type ShardedPoolBuilder func(shards []ShardInfo) (*ShardedGedis, error)
 
 // 默认使用
-func NewShardedGedisPool(shards []ShardInfo, size int) (*ShardedGedisPool, error) {
-	return NewShardedGedisPoolWithCustom(shards, size, NewShardedGedis(shards))
+func NewShardedPool(shards []ShardInfo, size int) (*ShardedGedisPool, error) {
+	return NewShardedPoolWithCustom(shards, size, NewShardedGedis(shards))
 }
 
-func NewShardedGedisPoolWithCustom(shards []ShardInfo, size int, builder ShardedPoolBuilder) (*ShardedGedisPool, error) {
-	gedises := make([]*ShardedGedis, 0, size)
+func NewShardedPoolWithCustom(shards []ShardInfo, size int, builder ShardedPoolBuilder) (*ShardedGedisPool, error) {
+	gs := make([]*ShardedGedis, 0, size)
 	for i := 0; i < size; i++ {
-		gedis, err := builder(shards)
+		g, err := builder(shards)
 		if err != nil {
-			for _, g := range gedises {
+			for _, g := range gs {
 				g.Close()
 			}
 			return nil, err
 		}
-		if gedis != nil {
-			gedises = append(gedises, gedis)
+		if g != nil {
+			gs = append(gs, g)
 		}
 	}
 	p := ShardedGedisPool{
 		shards: shards,
-		pool: make(chan *ShardedGedis, len(gedises)),
+		pool: make(chan *ShardedGedis, len(gs)),
 		builder: builder,
 	}
-	for i := range gedises {
-		p.pool <- gedises[i]
+	for i := range gs {
+		p.pool <- gs[i]
 	}
 	return &p, nil
 }

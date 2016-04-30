@@ -7,7 +7,7 @@ type Gedis struct {
 
 	// 如果Gedis对象是从pool中获取，则设置pool属性
 	// 用于在close是判断是真的关闭连接，还是还给pool
-	Pool *GedisPool
+	Pool *Pool
 }
 
 func NewGedis(host string, port int) (*Gedis, error) {
@@ -67,4 +67,8 @@ func (g *Gedis)Shutdown() error {
 
 func (g *Gedis)Quit() {
 	g.conn.Exec("QUIT")
+}
+
+func (g *Gedis)Sentinel(args...interface{}) ([]string, error) {
+	return g.conn.Exec("SENTINEL", args).List()
 }

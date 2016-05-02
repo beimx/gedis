@@ -7,7 +7,7 @@ type Gedis struct {
 
 	// 如果Gedis对象是从pool中获取，则设置pool属性
 	// 用于在close是判断是真的关闭连接，还是还给pool
-	Pool *Pool
+	Pool Pool
 }
 
 func NewGedis(host string, port int) (*Gedis, error) {
@@ -30,45 +30,56 @@ func (g *Gedis)Close() {
 	}
 }
 
+func (g *Gedis)ReadReply() *Reply {
+	return g.conn.ReadReply()
+}
+
+func (g *Gedis)Cmd(cmd string, args...interface{}) *Reply {
+	return g.conn.Exec(cmd, args...)
+}
 // Gedis提供基本的Redis操作命令 TODO 后续不断完善
 
 // set成功后返回"OK"
 func (g *Gedis)Set(key string, value interface{}) (string, error) {
-	return g.conn.Exec("SET", value).Str()
+	return g.Cmd("SET", value).Str()
 }
 
 func (g *Gedis)Get(key string) *Reply {
-	return g.conn.Exec("GET")
+	return g.Cmd("GET")
 }
 
 func (g *Gedis)Del(keys... string) (int, error) {
-	return g.conn.Exec("DEL", keys).Int()
+	return g.Cmd("DEL", keys).Int()
 }
 
 func (g *Gedis)Ping() (string, error) {
-	return g.conn.Exec("PING").Str()
+	return g.Cmd("PING").Str()
 }
 
 func (g *Gedis)Echo(message interface{}) (string, error) {
-	return g.conn.Exec("ECHO", message).Str()
+	return g.Cmd("ECHO", message).Str()
 }
 
 func (g *Gedis)Select(index int) (string, error) {
-	return g.conn.Exec("SELECT", strconv.Itoa(index)).Str()
+	return g.Cmd("SELECT", strconv.Itoa(index)).Str()
 }
 
 func (g *Gedis)Save() (string, error) {
-	return g.conn.Exec("SAVE").Str()
+	return g.Cmd("SAVE").Str()
 }
 
 func (g *Gedis)Shutdown() error {
-	return g.conn.Exec("SHUTDOWN").Nil()
+	return g.Cmd("SHUTDOWN").Nil()
 }
 
 func (g *Gedis)Quit() {
-	g.conn.Exec("QUIT")
+	g.Cmd("QUIT")
+}
+
+func (g *Gedis)Subscribe(channels... string) {
+	g.Cmd("SUBSCRIBE", channels...)
 }
 
 func (g *Gedis)Sentinel(args...interface{}) ([]string, error) {
-	return g.conn.Exec("SENTINEL", args).List()
+	return g.Cmd("SENTINEL", args).List()
 }

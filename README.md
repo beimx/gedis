@@ -1,13 +1,43 @@
 #### Golang 实现的Redis客户端
 
 -----
-##### 一个Gedis对象代表一个Redis连接，即一个Connection
+##### 参照Jedis的思路实现的Redis客户端
 
-> * Pool 普通的Redis连接池
+> * GedisPool 普通客户端连接池
 
-> * ShardedPool 实现分片的Redis连接池
+> * ShardedPool 分片客户端连接池，主从切换无感知
 
-> * SentinelPool 实现哨兵模式的连接池
+> * SentinelPool 哨兵模式的客户端连接池，可感知主从切换
+
+> * ShardedJedisSentinelPool 参照[我另外一个Java实现版](https://github.com/jianfeng-parker/moat/blob/master/src/main/java/cn/ubuilding/moat/redis/pool/ShardedJedisSentinelPool.java)，支持以分片的方式使用主从；
+    待实现...
+    
+> * Pub/Sub
+
+> * 测试代码待实现...
+    
+##### 模型结构
+                                         +-----------+
+                               +-------> | GedisPool |-----------+                   +-------+       +------------+
+                               |         +-----------+           |------------------>| Gedis |------>| Connection |
+                               |         +--------------+        |                   +-------+       +------------+
+                               +-------> | SentinelPool |--------+                      /\ 
+  +----------------------+     |         +--------------+                               |
+  |   User Application   |-----+                                                        |
+  +----------------------+     |         +--------------+                               |
+                               +-------> | ShardedPool  |------------------+         +--------------+                   
+                               |         +--------------+                  |-------->| ShardedGedis |
+                               |         +--------------------------+      |         +--------------+
+                               +-------> | ShardedJedisSentinelPool |------+        
+                                         +--------------------------+ 
+                               
+                            
+                            
+                            
+ 
+
+
+
 
 
 

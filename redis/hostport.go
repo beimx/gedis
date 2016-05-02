@@ -15,12 +15,16 @@ func (hap *HostAndPort)GetPort() int {
 	return hap.port
 }
 
-func (hap *HostAndPort)equal(obj interface{}) bool {
+func (hap *HostAndPort)Equal(obj interface{}) bool {
 	h, ok := obj.(HostAndPort)
 	if ok {
 		return convertHost(hap.host) == convertHost(h.host) && hap.port == h.port
 	}
 	return false
+}
+
+func (hap *HostAndPort)Str() string {
+	return hap.host + ":" + hap.port
 }
 
 func convertHost(host string) string {

@@ -1,7 +1,7 @@
-#### Golang 实现的Redis客户端
+#### Golang参照Jedis的思路实现的Redis客户端
 
 -----
-##### 参照Jedis的思路实现的Redis客户端
+##### 主要特性
 
 > * GedisPool 普通客户端连接池
 
